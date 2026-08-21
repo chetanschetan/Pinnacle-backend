@@ -7,7 +7,7 @@ import { Request } from 'express';
 
 console.log("CHECKING S3 ENV:", {
   region: process.env.AWS_REGION,
-  bucket: process.env.AWS_BUCKET_NAME,
+  bucket: process.env.AWS_S3_BUCKET_NAME,
   hasKey: !!process.env.AWS_ACCESS_KEY_ID,
   hasSecret: !!process.env.AWS_SECRET_ACCESS_KEY
 });
