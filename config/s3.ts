@@ -21,7 +21,7 @@ const s3 = new S3Client({
 
 const storage = multerS3({
   s3: s3,
-  bucket: process.env.AWS_S3_BUCKET_NAME || 'pinnacle-storage-2026',
+  bucket: 'pinnacle-storage-2026',
   contentType: multerS3.AUTO_CONTENT_TYPE,
   key: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
