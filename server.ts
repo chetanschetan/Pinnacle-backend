@@ -47,47 +47,6 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
-const onlineUsers = new Map();
-
-// io.on('connection', (socket) => {
-//   console.log(`⚡ Socket.io: Connected (${socket.id})`);
-
-//   socket.on('join', (userId) => {
-//     const cleanId = String(userId).trim();
-//     if (cleanId && cleanId !== "undefined" && cleanId !== "null") {
-//       onlineUsers.set(cleanId, socket.id);
-//       console.log(`👤 Socket.io: User Joined -> ${cleanId}`);
-//     }
-//   });
-
-//   socket.on('sendMessage', (data) => {
-//     const { receiverId, content, senderId, senderName } = data;
-//     const rId = String(receiverId).trim();
-//     const sId = String(senderId).trim();
-//     const receiverSocketId = onlineUsers.get(rId);
-
-//     if (receiverSocketId) {
-//       io.to(receiverSocketId).emit('receiveMessage', {
-//         senderId: sId, 
-//         senderName,
-//         content,
-//         createdAt: new Date().toISOString()
-//       });
-//     } else {
-//       socket.emit('error', { message: "Recipient is offline" });
-//     }
-//   });
-
-//   socket.on('disconnect', () => {
-//     for (let [uId, sId] of onlineUsers.entries()) {
-//       if (sId === socket.id) {
-//         onlineUsers.delete(uId);
-//         break;
-//       }
-//     }
-//   });
-// });
-
 io.on('connection', (socket) => {
   console.log(`⚡ Socket.io: Connected (${socket.id})`);
 
@@ -124,20 +83,13 @@ io.on('connection', (socket) => {
   });
 });
 
-
 // Middlewares
 app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: false }));
-// Explicit Preflight Handling for Cloudflare Tunnel & AWS
-app.options('*', cors({
-  origin: true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
-}));
 
+// CORS middleware handles preflight requests automatically, removed the wildcard options block to fix path-to-regexp error
 app.use(cors({
-  origin: true, // Sabhi origins allow karega tunnel ke through
+  origin: true, 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
