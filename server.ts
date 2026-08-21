@@ -49,44 +49,81 @@ const io = new Server(server, {
 
 const onlineUsers = new Map();
 
+// io.on('connection', (socket) => {
+//   console.log(`⚡ Socket.io: Connected (${socket.id})`);
+
+//   socket.on('join', (userId) => {
+//     const cleanId = String(userId).trim();
+//     if (cleanId && cleanId !== "undefined" && cleanId !== "null") {
+//       onlineUsers.set(cleanId, socket.id);
+//       console.log(`👤 Socket.io: User Joined -> ${cleanId}`);
+//     }
+//   });
+
+//   socket.on('sendMessage', (data) => {
+//     const { receiverId, content, senderId, senderName } = data;
+//     const rId = String(receiverId).trim();
+//     const sId = String(senderId).trim();
+//     const receiverSocketId = onlineUsers.get(rId);
+
+//     if (receiverSocketId) {
+//       io.to(receiverSocketId).emit('receiveMessage', {
+//         senderId: sId, 
+//         senderName,
+//         content,
+//         createdAt: new Date().toISOString()
+//       });
+//     } else {
+//       socket.emit('error', { message: "Recipient is offline" });
+//     }
+//   });
+
+//   socket.on('disconnect', () => {
+//     for (let [uId, sId] of onlineUsers.entries()) {
+//       if (sId === socket.id) {
+//         onlineUsers.delete(uId);
+//         break;
+//       }
+//     }
+//   });
+// });
+
 io.on('connection', (socket) => {
   console.log(`⚡ Socket.io: Connected (${socket.id})`);
 
+  // 1. User joins their own private room using their MongoDB ID
   socket.on('join', (userId) => {
     const cleanId = String(userId).trim();
     if (cleanId && cleanId !== "undefined" && cleanId !== "null") {
-      onlineUsers.set(cleanId, socket.id);
-      console.log(`👤 Socket.io: User Joined -> ${cleanId}`);
+      socket.join(cleanId); // Built-in room joining
+      console.log(`👤 Socket.io: User Joined Room -> ${cleanId}`);
     }
   });
 
+  // 2. Send message directly to the recipient's room
   socket.on('sendMessage', (data) => {
     const { receiverId, content, senderId, senderName } = data;
     const rId = String(receiverId).trim();
     const sId = String(senderId).trim();
-    const receiverSocketId = onlineUsers.get(rId);
 
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit('receiveMessage', {
+    if (rId) {
+      // Broadcast to the receiver's room directly
+      io.to(rId).emit('receiveMessage', {
         senderId: sId, 
         senderName,
         content,
         createdAt: new Date().toISOString()
       });
     } else {
-      socket.emit('error', { message: "Recipient is offline" });
+      socket.emit('error', { message: "Invalid recipient ID" });
     }
   });
 
   socket.on('disconnect', () => {
-    for (let [uId, sId] of onlineUsers.entries()) {
-      if (sId === socket.id) {
-        onlineUsers.delete(uId);
-        break;
-      }
-    }
+    console.log(`🔌 Socket Disconnected: ${socket.id}`);
   });
 });
+
 
 // Middlewares
 app.set('trust proxy', 1);
