@@ -4,6 +4,13 @@ import multerS3 from 'multer-s3';
 import path from 'path';
 import { Request } from 'express';
 
+
+console.log("CHECKING S3 ENV:", {
+  region: process.env.AWS_REGION,
+  bucket: process.env.AWS_BUCKET_NAME,
+  hasKey: !!process.env.AWS_ACCESS_KEY_ID,
+  hasSecret: !!process.env.AWS_SECRET_ACCESS_KEY
+});
 const s3 = new S3Client({
   region: process.env.AWS_REGION || 'ap-south-1',
   credentials: {
