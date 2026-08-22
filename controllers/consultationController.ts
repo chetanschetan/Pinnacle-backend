@@ -3,11 +3,19 @@ import { Consultation } from '../models/Consultation';
 import { S3Client, DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import nodemailer from 'nodemailer';
 
+// const s3 = new S3Client({
+//   region: process.env.AWS_REGION || 'ap-south-1',
+//   credentials: {
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+//   }
+// });
+
 const s3 = new S3Client({
-  region: process.env.AWS_REGION || 'ap-south-1',
+  region: (process.env.AWS_REGION || 'ap-south-1').trim(),
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+    accessKeyId: String(process.env.AWS_ACCESS_KEY_ID || '').trim().replace(/['"]+/g, ''),
+    secretAccessKey: String(process.env.AWS_SECRET_ACCESS_KEY || '').trim().replace(/['"]+/g, ''),
   }
 });
 
