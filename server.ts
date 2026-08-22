@@ -63,12 +63,12 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', (data) => {
     const { receiverId, content, senderId, senderName } = data;
     const rId = String(receiverId).trim();
-    const sId = String(senderId).trim();
 
     if (rId) {
-      // Broadcast to the receiver's room directly
-      io.to(rId).emit('receiveMessage', {
-        senderId: sId, 
+      // 💡 io.to ki jagah socket.broadcast.to use kar, 
+      // taaki sender ko khud apna message socket se wapas na mile!
+      socket.broadcast.to(rId).emit('receiveMessage', {
+        senderId: String(senderId).trim(), 
         senderName,
         content,
         createdAt: new Date().toISOString()
